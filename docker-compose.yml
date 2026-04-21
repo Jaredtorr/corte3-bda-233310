@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: clinica_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clinica_vet
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./schema_corte3.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./backend/01_procedures.sql:/docker-entrypoint-initdb.d/02_procedures.sql
+      - ./backend/02_triggers.sql:/docker-entrypoint-initdb.d/03_triggers.sql
+      - ./backend/03_views.sql:/docker-entrypoint-initdb.d/04_views.sql
+      - ./backend/04_roles_y_permisos.sql:/docker-entrypoint-initdb.d/05_roles.sql
+      - ./backend/05_rls.sql:/docker-entrypoint-initdb.d/06_rls.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: clinica_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./api
+    container_name: clinica_api
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: clinica_vet
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    image: nginx:alpine
+    container_name: clinica_frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
