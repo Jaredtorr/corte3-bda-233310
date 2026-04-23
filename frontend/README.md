@@ -1,6 +1,25 @@
 # Sistema de Clínica Veterinaria — Corte 3 BDA
 **Stack:** PostgreSQL 16 + Redis 7 + FastAPI (Python) + React + Tailwind CSS  
-**Matrícula:** {TU-MATRICULA}
+**Matrícula:** 233310
+
+---
+
+## Screenshots
+
+### Panel de Control
+![Panel de Control](./screenshots/7.png)
+
+### Búsqueda con detección de SQL Injection
+![SQL Injection detectado](./screenshots/1.png)
+
+### RLS en acción — Dr. López ve solo sus mascotas
+![RLS López](./screenshots/4.png)
+
+### RLS en acción — Dra. García ve solo sus mascotas
+![RLS García](./screenshots/5.png)
+
+### Caché Redis — MISS → HIT
+![Redis Cache](./screenshots/6.png)
 
 ---
 
@@ -63,7 +82,7 @@ usuario no tiene permisos sobre una tabla, el procedure tampoco los tiene.
 
 El TTL elegido es **300 segundos (5 minutos)**.
 
-- La consulta `v_mascotas_vacunacion_pendiente` tarda ~200ms en ejecutarse
+- La consulta `v_mascotas_vacunacion_pendiente` tarda ~8ms en este entorno
 - Se llama aproximadamente 30-50 veces por hora en uso normal
 - Las vacunas no se aplican con tanta frecuencia como para necesitar datos 
   en tiempo real
@@ -130,7 +149,7 @@ docker compose up
 ```
 
 Servicios:
-- Frontend: http://localhost:3000
-- API: http://localhost:8000
-- PostgreSQL: puerto 5432
-- Redis: puerto 6379
+- Frontend: `http://localhost:3000`
+- API: `http://localhost:8000`
+- PostgreSQL: puerto `5432`
+- Redis: puerto `6379`
